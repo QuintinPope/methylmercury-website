@@ -1,0 +1,121 @@
+extends layout
+
+block content
+  h1= title
+  form(name="input", method="post", id="form", action="/draw")
+    p
+    |  Weight: 
+    label(for="eq", name="Weight (kg):")
+    input(type="text", name="weight", value="70", size="6")
+  
+    |  Select units:    
+    select(name="weightUnits")
+      option(value="1") kg
+      option(value="0.45359") lbs
+    
+    p
+    p
+    |  Select body type:    
+    select(name="btype")
+      option(value="2") Adult Male
+      option(value="1") Child
+      option(value="3") Adult Female
+    
+    p
+    p
+    |  Select fish type:    
+    select(name="ftype")
+      option(value="0.280") Swordfish         (0.280 ppm)
+      option(value="0.140") Tuna              (0.140 ppm)
+      option(value="0.130") Cod               (0.130 ppm)
+      option(value="0.110") Greater amberjack (0.110 ppm)
+      option(value="0.097") Salmon            (0.097 ppm)
+      option(value="0.065") Hairtail          (0.065 ppm)
+      option(value="0.050") Tilapia           (0.050 ppm)
+      option(value="0.017") Mackerel          (0.017 ppm)
+      option(value="0.006") Milkfish          (0.006 ppm)
+      option(value="0.002") Anchovy           (0.002 ppm)
+
+      //
+        option(value="1.123")  Tilefish (Gulf of Mexico)  1.123
+        option(value="0.995")  Swordfish  0.995
+        option(value="")  Shark  0.979
+        option(value="")  Mackerel (king)  0.730
+        option(value="")  Tuna (bigeye)  0.689
+        option(value="")  Orange roughy  0.571
+        option(value="")  Marlin  0.485
+        option(value="")  Mackerel (Spanish)  0.454
+        option(value="")  Grouper  0.448
+        option(value="")  Tuna  0.391
+        option(value="")  Bluefish  0.368
+        option(value="")  Sablefish  0.361
+        option(value="")  Tuna (albacore)  0.358
+        option(value="")  Patagonian toothfish  0.354
+        option(value="")  Tuna (yellowfin)  0.354
+        option(value="")  Croaker white  0.287
+        option(value="")  Halibut  0.241
+        option(value="")  Weakfish  0.235
+        option(value="")  Scorpionfish  0.233
+        option(value="")  Monkfish  0.181
+        option(value="")  Snapper  0.166
+        option(value="")  Bass  0.152
+        option(value="")  Perch  0.150
+        option(value="")  Tilefish (Atlantic)  0.144
+        option(value="")  Tuna (skipjack)  0.144
+        option(value="")  Buffalofish  0.137
+        option(value="")  Skate  0.137
+        option(value="")  Perch (ocean)  0.121
+        option(value="")  Cod  0.111
+        option(value="")  Carp 0.110
+        option(value="")  Lobster (American)  0.107
+        option(value="")  Sheephead (California)  0.093
+        option(value="")  Lobster (spiny)  0.093
+        option(value="")  Whitefish  0.089
+        option(value="")  Mackerel (chub)  0.088
+        option(value="")  Herring  0.084
+        option(value="")  Jacksmelt  0.081
+        option(value="")  Hake  0.079
+        option(value="")  Trout  0.071
+        option(value="")  Crab  0.065
+        option(value="")  Butterfish  0.058
+        option(value="")  Flatfish  0.056
+        option(value="")  Haddock  0.055
+        option(value="")  Whiting  0.051
+        option(value="")  Mackerel (Atlantic)  0.050
+        option(value="")  Croaker (Atlantic)  0.065
+        option(value="")  Mullet 0.050
+        option(value="")  Shad (American) 0.039
+        option(value="")  Crayfish  0.035
+        option(value="")  Pollock  0.031
+        option(value="")  Catfish  0.025
+        option(value="")  Squid  0.023
+        option(value="")  Salmon  0.022
+        option(value="")  Anchovies  0.017
+        option(value="")  Sardine  0.013
+        option(value="")  Tilapia  0.013
+        option(value="")  Oyster  0.012
+        option(value="")  Clam  0.009
+        option(value="")  Scallop  0.003
+        option(value="")  Shimp  0.001
+    
+    p
+    |  Meal size: 
+    input(type="text", name="meal_size", value="8", size="6")
+
+    |  Select units:    
+    select(name="mealUnits")
+      option(value="28.350") oz
+      option(value="1") grams
+    
+    p
+
+    input(type="submit", value="Display Plot")
+  form(name="toAdvanced", method="post", id="toAdv", action="/advanced")
+    input(type="submit", value="Advanced Version")
+  
+  p
+  | By entering your weight, body type, meal type, and meal size, then pressing "Display Plot", you can see a prediction of the methylmercury concentration in your blood, brain and muscle tissues, assuming you ate one such meal a week for nine weeks.
+  p
+  | This website is intended as an educational tool, not as medical advice. If you have any concerns related to methylmercury consumption, please consult your primary care provider. 
+  p
+  | Compatibility Note: The ploting library I used seems to be incompatible with Safari, but I've not had any problems with Firefox, Chrome or Edge.

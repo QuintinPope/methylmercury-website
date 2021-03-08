@@ -1,0 +1,156 @@
+extends layout
+
+
+block content
+    style.
+        body {
+            background: #222222;
+        }
+    div(id="div1", style="position:absolute; top:60px; left:1100px; z-index:1")
+        canvas(id="blood", width="400", height="300", x="1100")
+    canvas(id="plotCanvas1", width="1000", height="300")
+
+    div(id="div2", style="position:absolute; top:360px; left:1100px; z-index:1")
+        canvas(id="brain", width="400", height="300", x="1100")
+    canvas(id="plotCanvas2", width="1000", height="300")
+
+    div(id="div3", style="position:absolute; top:660px; left:1100px; z-index:1")
+        canvas(id="body", width="400", height="300", x="1100")
+    canvas(id="plotCanvas3", width="1000", height="300")
+    div(id="div4", style="position:absolute; top:1000px; left:0px; z-index:1")
+        canvas(id="data", width="800", height="300", x="20")
+
+    script(src="scripts/smoothie.js")
+    script.
+        var blood_cons = [!{blood_vals}];
+        var brain_cons = [!{brain_vals}];
+        var body_cons = [!{body_vals}];
+        var halflife = !{halflife};
+        var equ_time = !{equ_time};
+
+        var times = [!{timeVals}];
+        var max_blood_con = Math.max.apply(Math, blood_cons);
+        var max_brain_con = Math.max.apply(Math, brain_cons);
+        var max_body_con = Math.max.apply(Math, body_cons);
+        var max = Math.max.apply(Math, [max_blood_con, max_body_con, max_brain_con]);
+        console.log(max);
+
+        var n_data_points = times.length;
+        var plot_delay = 180.0/10; //(in ms)
+
+        var blood_img = new Image();
+        var blood_img_x = 0;
+        blood_img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Blood_drop.svg/367px-Blood_drop.svg.png";
+
+        var brain_img = new Image();
+        var brain_img_x = 0;
+        brain_img.src = "https://2.bp.blogspot.com/-EiE39QC2Rqw/UPNMBBpsosI/AAAAAAAAAII/KAiWE-iCGAc/s1600/ns.jpg";
+
+        var body_img = new Image();
+        var body_img_x = 0;
+        body_img.src = "https://d6jqw9xqwlr8r.cloudfront.net/assets/vpl_0184_001/vpl_0184_001-flv_pre.jpg";
+
+        window.onload=function() {
+            // create an empty canvas element
+            var p1 = document.getElementById("blood");
+            var ptx1 = p1.getContext("2d");
+
+            var p2 = document.getElementById("brain");
+            var ptx2 = p2.getContext("2d");
+
+            var p3 = document.getElementById("body");
+            var ptx3 = p3.getContext("2d");
+
+            var g1 = document.getElementById("plotCanvas1");
+            var gctx1 = g1.getContext("2d");
+
+            var g2 = document.getElementById("plotCanvas2");
+            var gctx2 = g2.getContext("2d");
+
+            var g3 = document.getElementById("plotCanvas3");
+            var gctx3 = g3.getContext("2d");
+
+            var dataCanvas = document.getElementById("data");
+            var dctx = dataCanvas.getContext("2d");
+
+
+            dctx.font = "25px serif";
+            dctx.fillStyle = "rgb(255, 255, 255)";
+            dctx.fillText("Note: plot units are micrograms per liter.", 40, 40);
+            dctx.fillText("Halflife: " + (halflife).toFixed(2) + " days", 40, 80); 
+            dctx.fillText("Time to equilibrium : " + (equ_time).toFixed(2) + " days", 40, 120); 
+
+            blood_img.width = 200;
+            blood_img.height = p1.height;
+
+            brain_img.width = 200;
+            brain_img.height = p2.height;
+
+            body_img.width = 200;
+            body_img.height = p3.height;
+            var mspp = 15;
+            var line_sep1 = max / 8;
+            var line_sep2 = max / 8;
+            var line_sep3 = max / 8;
+
+            var hlines1 = [{color:'#ffffff',lineWidth:1,value:0},{color:'#880000',lineWidth:2,value:1*line_sep1},
+                {color:'#880000',lineWidth:2,value:2*line_sep1},{color:'#880000',lineWidth:2,value:3*line_sep1},{color:'#880000',lineWidth:2,value:4*line_sep1},
+                {color:'#880000',lineWidth:2,value:5*line_sep1},{color:'#880000',lineWidth:2,value:6*line_sep1},{color:'#880000',lineWidth:2,value:7*line_sep1}];
+            var hlines2 = [{color:'#ffffff',lineWidth:1,value:0},{color:'#880000',lineWidth:2,value:1*line_sep2},
+                {color:'#880000',lineWidth:2,value:2*line_sep2},{color:'#880000',lineWidth:2,value:3*line_sep2},{color:'#880000',lineWidth:2,value:4*line_sep2},
+                {color:'#880000',lineWidth:2,value:5*line_sep2},{color:'#880000',lineWidth:2,value:6*line_sep2},{color:'#880000',lineWidth:2,value:7*line_sep2}];
+            var hlines3 = [{color:'#ffffff',lineWidth:1,value:0},{color:'#880000',lineWidth:2,value:1*line_sep3},
+                {color:'#880000',lineWidth:2,value:2*line_sep3},{color:'#880000',lineWidth:2,value:3*line_sep3},{color:'#880000',lineWidth:2,value:4*line_sep3},
+                {color:'#880000',lineWidth:2,value:5*line_sep3},{color:'#880000',lineWidth:2,value:6*line_sep3},{color:'#880000',lineWidth:2,value:7*line_sep3}];
+        
+            var smoothie1 = new SmoothieChart({millisPerPixel:mspp,grid:false,
+                labels:{fontSize:15},maxValue:max,minValue:0,horizontalLines:hlines1});
+            smoothie1.streamTo(document.getElementById("plotCanvas1"), 50);
+            var line1 = new TimeSeries();
+
+            var smoothie2 = new SmoothieChart({millisPerPixel:mspp,grid:false,
+                labels:{fontSize:15},maxValue:max,minValue:0,horizontalLines:hlines2});
+            smoothie2.streamTo(document.getElementById("plotCanvas2"), 50);
+            var line2 = new TimeSeries();
+
+            var smoothie3 = new SmoothieChart({millisPerPixel:mspp,grid:false,
+                labels:{fontSize:15},maxValue:max,minValue:0,horizontalLines:hlines3});
+            smoothie3.streamTo(document.getElementById("plotCanvas3"), 50);
+            var line3 = new TimeSeries();
+
+
+            var j = 0;
+            function animate_step(){
+                if(j<n_data_points) {
+                    
+                    line1.append(new Date().getTime(), blood_cons[j]);
+                    ptx1.globalAlpha = blood_cons[j] / max;
+                    ptx1.clearRect(blood_img_x, 0, blood_img.width, blood_img.height);
+                    ptx1.drawImage(blood_img, blood_img_x, 0, blood_img.width, blood_img.height);
+
+                    line2.append(new Date().getTime(), brain_cons[j]);
+                    ptx2.globalAlpha = brain_cons[j] / max;
+                    ptx2.clearRect(brain_img_x, 0, brain_img.width, brain_img.height);
+                    ptx2.drawImage(brain_img, brain_img_x, 0, brain_img.width, brain_img.height);
+
+                    line3.append(new Date().getTime(), body_cons[j]);
+                    ptx3.globalAlpha = body_cons[j] / max;
+                    ptx3.clearRect(body_img_x, 0, body_img.width, body_img.height);
+                    ptx3.drawImage(body_img, body_img_x, 0, body_img.width, body_img.height);
+                    j += 1;
+                }
+                else {
+                    smoothie1.stop();
+                    smoothie2.stop();
+                    smoothie3.stop();
+                }
+            }
+            smoothie1.addTimeSeries(line1, {lineWidth:4,strokeStyle:'blue',fillStyle:'rgba(50,55,222,0.41)'});
+            smoothie2.addTimeSeries(line2, {lineWidth:4,strokeStyle:'blue',fillStyle:'rgba(50,55,222,0.41)'});
+            smoothie3.addTimeSeries(line3, {lineWidth:4,strokeStyle:'blue',fillStyle:'rgba(50,55,222,0.41)'});
+            var interval;
+            setInterval(animate_step, plot_delay);
+
+            setTimeout(clearInterval(interval), plot_delay * n_data_points + 1000);
+
+        }

@@ -1,0 +1,10 @@
+body {
+  padding: 50px;
+  font: 18px "Courier New", Helvetica, Arial, sans-serif;
+  color: white;
+  background: rgb(0, 31, 43);
+}
+
+a {
+  color: #00B7FF;
+}
